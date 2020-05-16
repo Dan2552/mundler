@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "mundler"
+require "thor"
+
+class Mundle < Thor
+  include Thor::Actions
+
+  desc "install", "Download and compile mruby"
+  def install
+    Mundler.install
+  end
+
+  desc "update", "Same as install except it forces recompile"
+  def update
+    Mundler.install(force: true)
+  end
+
+  desc "clean", "Removes cached versions of mruby."
+  def clean
+    Mundler.clean
+  end
+
+  desc "exec", "Execute command with mruby's bin prepended to $PATH"
+  def exec(*args)
+    Mundler.exec(args)
+  end
+
+  desc "path", "prints out the path relevant to the compiled version of mruby relevant to the `Mundlefile`"
+  def path
+    Mundler.path
+  end
+
+  default_task :install
+end
+
+Mundle.start(ARGV)
