@@ -13,31 +13,31 @@ if `which xcrun`.chomp.strip.length > 0
   ios_flags = base_flags + %W(-arch armv7 -arch arm64 -isysroot #{ios_sdk})
   ios_simulator_flags = base_flags + %W(-arch i386 -arch x86_64 -isysroot #{ios_simulator_sdk})
 
-  MRuby::CrossBuild.new('ios') do |conf|
-    {{ contents }}
+  # MRuby::CrossBuild.new('ios') do |conf|
+  #    contents
 
-    conf.cc do |cc|
-      cc.command = clang_path
-      cc.flags = ios_flags
-    end
+  #   conf.cc do |cc|
+  #     cc.command = clang_path
+  #     cc.flags = ios_flags
+  #   end
 
-    conf.linker do |l|
-      l.command = clang_path
-      l.flags = ios_flags
-    end
-  end
+  #   conf.linker do |l|
+  #     l.command = clang_path
+  #     l.flags = ios_flags
+  #   end
+  # end
 
-  MRuby::CrossBuild.new('ios-simulator') do |conf|
-    {{ contents }}
+  # MRuby::CrossBuild.new('ios-simulator') do |conf|
+  #   contents
 
-    conf.cc do |cc|
-      cc.command = clang_path
-      cc.flags = ios_simulator_flags
-    end
+  #   conf.cc do |cc|
+  #     cc.command = clang_path
+  #     cc.flags = ios_simulator_flags
+  #   end
 
-    conf.linker do |l|
-      l.command = clang_path
-      l.flags = ios_simulator_flags
-    end
-  end
+  #   conf.linker do |l|
+  #     l.command = clang_path
+  #     l.flags = ios_simulator_flags
+  #   end
+  # end
 end
