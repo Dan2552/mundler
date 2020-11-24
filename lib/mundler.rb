@@ -94,7 +94,9 @@ module Mundler
   def self.hex
     @hex ||= begin
       contents = File.read(File.join(Dir.pwd, "Mundlefile"))
-      Digest::MD5.hexdigest(contents)
+      build_config = File.read(File.join(__dir__, "mundler", "build_config.rb"))
+      build_config.gsub!("{{ contents }}", contents)
+      Digest::MD5.hexdigest(build_config)
     end
   end
 
