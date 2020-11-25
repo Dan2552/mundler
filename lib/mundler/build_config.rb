@@ -28,6 +28,8 @@ if `which xcrun`.chomp.strip.length > 0 && `uname -a`.chomp.include?("arm64")
 else
   MRuby::Build.new do |conf|
     toolchain :clang
+
+    {{ contents }}
   end
 end
 
