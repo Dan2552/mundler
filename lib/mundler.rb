@@ -119,6 +119,7 @@ module Mundler
     path = bin_dir + ":" + ENV['PATH']
 
     system({ "PATH" => path }, *args)
+    exit($?.exitstatus)
   end
 
   def self.path
