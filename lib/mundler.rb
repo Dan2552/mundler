@@ -118,8 +118,10 @@ module Mundler
     bin_dir = File.join(ENV["HOME"], ".mundler", hex, "bin")
     path = bin_dir + ":" + ENV['PATH']
 
-    system({ "PATH" => path }, *args)
+    Process.spawn({ "PATH" => path }, *args)
+    Process.wait
     exit($?.exitstatus)
+  rescue Interrupt
   end
 
   def self.path
