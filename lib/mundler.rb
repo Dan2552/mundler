@@ -120,7 +120,7 @@ module Mundler
 
     Process.spawn({ "PATH" => path }, *args)
     Process.wait
-    exit($?.exitstatus)
+    exit($?.exitstatus) if $?.exitstatus
   rescue Interrupt
   end
 
