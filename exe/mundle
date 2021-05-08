@@ -7,6 +7,10 @@ require "thor"
 class Mundle < Thor
   include Thor::Actions
 
+  def self.exit_on_failure?
+    true
+  end
+
   desc "install", "Download and compile mruby"
   def install
     Mundler.install
