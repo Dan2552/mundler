@@ -10,7 +10,9 @@ def main
   exit($?.exitstatus || 0)
 end
 
-if defined?(Bundler)
+if defined?(Bundler) && Bundler.respond_to?(:with_unbundled_env)
+  Bundler.with_unbundled_env { main }
+elsif defined?(Bundler)
   Bundler.with_clean_env { main }
 else
   main

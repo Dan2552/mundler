@@ -82,7 +82,7 @@ module Mundler
       dir = __dir__
       cached_git_dir = File.expand_path(File.join(dir, "..", "cached_git"))
 
-      Bundler.with_clean_env do
+      compile = Proc.new do
         system(
           {
             "MRUBY_CONFIG" => tempfile.path,
@@ -94,8 +94,17 @@ module Mundler
           error_out("Failed to compile.")
         end
       end
+
+      if defined?(Bundler) && Bundler.respond_to?(:with_unbundled_env)
+        Bundler.with_unbundled_env(&compile)
+      elsif defined?(Bundler)
+        Bundler.with_clean_env(&compile)
+      else
+        compile.call
+      end
+
       log_thread.kill
-      puts "Successfully compiled mruby."
+      puts "\n\nSuccessfully compiled mruby."
       summary
     rescue Interrupt
       FileUtils.rm_rf(File.join(mundler_root, hex))
