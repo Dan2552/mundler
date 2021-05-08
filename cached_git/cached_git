@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+
+paths = ENV["PATH"].split(":")
+script_dir = File.expand_path(__dir__)
+paths.delete_if { |p| p.strip == script_dir.strip }
+
+if ARGV[0] == "clone"
+  repo = ARGV[-2]
+  target = ARGV[-1]
+  original_repo = repo
+  repo = repo.gsub(/.git$/, "")
+  repo_org = repo.split("/")[-2]
+  repo_name = repo.split("/")[-1]
+
+  mundler_root = File.join(ENV["HOME"], ".mundler")
+  cache_root = File.join(mundler_root, "cache")
+
+  unless File.directory?(File.join(cache_root, repo_org, repo_name))
+    FileUtils.mkdir_p(File.join(cache_root, repo_org))
+    FileUtils.cd(File.join(cache_root, repo_org)) do
+      system(
+        { "PATH" => paths.join(":") },
+        "git clone #{original_repo}"
+      )
+    end
+    status = $?.exitstatus
+    if status != 0
+      puts "Real git failed with status #{status}"
+      exit(status)
+    end
+  end
+
+  full_target = target.start_with?("/") ? target : File.expand_path(File.join(Dir.pwd, target))
+
+  if File.directory?(full_target) && Dir.glob(File.join(full_target, "**", "*")).count > 0
+    warn "fatal: destination path '#{target}' already exists and is not an empty directory."
+    exit 1
+  else
+    # require 'irb'
+    # binding.irb
+    FileUtils.cp_r(
+      File.join(cache_root, repo_org, repo_name, "."),
+      File.join(full_target)
+    )
+    puts "Copied #{repo_name} from cache as #{target} (#{full_target})"
+  end
+else
+  system(
+    { "PATH" => paths.join(":") },
+    "git #{ARGV.join(" ")}"
+  )
+  exit($?.exitstatus || 0)
+end

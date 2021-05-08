@@ -1,11 +1,13 @@
 require "mundler/version"
 require "tempfile"
 require "digest"
+require "pathname"
 
 module Mundler
   def self.install(force: false)
     unless needs_reinstall? || force
       puts "Nothing to do."
+      summary
       return
     end
 
@@ -23,18 +25,30 @@ module Mundler
 
     FileUtils.cd(mundler_root)
 
+    cache_root = File.join(mundler_root, "cache")
+
+    repo_org, repo_name = repo.split("/")
+
     # Download mruby if it doesn't exist locally
+    unless File.directory?(File.join(cache_root, repo_org, repo_name))
+      FileUtils.mkdir_p(File.join(cache_root, repo_org))
+      FileUtils.cd(File.join(cache_root, repo_org))
+      system("git clone https://github.com/#{repo}.git #{repo_name} >/dev/null 2>&1") ||
+        error_out("Failed to clone mruby: #{repo}")
+    end
+
     unless File.directory?(File.join(mundler_root, hex))
-      system("git clone https://github.com/#{repo}.git #{hex}") ||
-        error_out("Failed to clone mruby")
+      FileUtils.cp_r(
+        File.join(cache_root, repo_org, repo_name),
+        File.join(mundler_root, hex)
+      )
     end
 
     FileUtils.cd(File.join(mundler_root, hex))
 
-    system("git fetch") ||
+    system("git fetch >/dev/null 2>&1") ||
       error_out("Failed to git fetch")
-
-    system("git reset --hard #{version}") ||
+    system("git reset --hard #{version} >/dev/null 2>&1") ||
       error_out("Failed to set version to #{version}")
 
     config_file = Tempfile.new("mundler")
@@ -45,16 +59,52 @@ module Mundler
     rake = `which rake`.chomp
 
     tempfile = Tempfile.new(['mundler_config', '.rb'])
+    logfile = Tempfile.new(['mundler_build', '.log'])
     begin
       File.write(tempfile, build_config)
 
-      system(
-        { "MRUBY_CONFIG" => tempfile.path },
-        "#{rake} clean && #{rake} deep_clean && #{rake}"
-      ) || error_out("Failed to compile.")
+      covered = []
+
+      log_thread = Thread.new do
+        loop do
+          Dir.glob(File.join(Dir.pwd, "build", "*", "*", "*")).each do |file|
+            pathname = Pathname.new(file)
+            directory = pathname.directory? ? pathname.to_s : Pathname.new(file).dirname.to_s
+            next if covered.include?(directory)
+            covered << directory
+
+            print "\e[32m.\e[0m"
+          end
+          sleep 0.3
+        end
+      end
+
+      dir = __dir__
+      cached_git_dir = File.expand_path(File.join(dir, "..", "cached_git"))
+
+      Bundler.with_clean_env do
+        system(
+          {
+            "MRUBY_CONFIG" => tempfile.path,
+            "PATH" => ([cached_git_dir] + ENV["PATH"].split(":")).join(":")
+          },
+          "#{rake} deep_clean >#{logfile.path} 2>&1 && #{rake} >#{logfile.path} 2>&1"
+        ) || begin
+          puts File.read(logfile)
+          error_out("Failed to compile.")
+        end
+      end
+      log_thread.kill
+      puts "Successfully compiled mruby."
+      summary
+    rescue Interrupt
+      FileUtils.rm_rf(File.join(mundler_root, hex))
+      exit(1)
     ensure
       tempfile.close
       tempfile.delete
+      logfile.close
+      logfile.delete
     end
 
     FileUtils.cd(project_directory)
@@ -63,9 +113,9 @@ module Mundler
   end
 
   def self.clean
-    return unless File.directory?(File.join(ENV["HOME"], ".mundler"))
-
-    FileUtils.remove_dir(File.join(ENV["HOME"], ".mundler"))
+    mundler_root = File.join(ENV["HOME"], ".mundler")
+    return unless File.directory?(File.join(mundler_root, hex))
+    FileUtils.rm_rf(File.join(mundler_root, hex))
   end
 
   def self.read_mundlefile
@@ -126,5 +176,16 @@ module Mundler
 
   def self.path
     puts File.join(ENV["HOME"], ".mundler", hex)
+  end
+
+  def self.summary
+    mundler_root = File.join(ENV["HOME"], ".mundler")
+    FileUtils.cd(File.join(mundler_root, hex))
+    puts ""
+    puts "Libraries:"
+    Dir.glob(File.join(Dir.pwd, "**", "*.a")).each { |a| puts "* " + a.split("build/").last }
+    puts ""
+    puts "Binaries:"
+    Dir.glob(File.join(Dir.pwd, "build", "host", "bin", "*")).each { |a| puts "* " + a.split("/").last }
   end
 end
