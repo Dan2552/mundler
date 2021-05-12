@@ -193,8 +193,12 @@ module Mundler
     puts ""
     puts "Libraries:"
     Dir.glob(File.join(Dir.pwd, "**", "*.a")).each { |a| puts "* " + a.split("build/").last }
-    puts ""
-    puts "Binaries:"
-    Dir.glob(File.join(Dir.pwd, "build", "host", "bin", "*")).each { |a| puts "* " + a.split("/").last }
+
+    binaries = Dir.glob(File.join(Dir.pwd, "build", "host", "bin", "*"))
+    if binaries.count > 0
+      puts ""
+      puts "Binaries:"
+      binaries.each { |a| puts "* " + a.split("/").last }
+    end
   end
 end
