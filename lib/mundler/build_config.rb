@@ -5,6 +5,10 @@ begin
     :macos => [:x86_64, :arm64]
   }.freeze
 
+  def only_host_platform!
+    @platforms = {}
+  end
+
   def clang_path(set = nil)
     @clang_path = set if set
     @clang_path || clang_path = `xcrun -find clang`.chomp
@@ -54,6 +58,18 @@ begin
   def host_is_macos?
     `which xcrun`.chomp.strip.length > 0
   end
+
+  class FakeConfig
+    def gem(*args); end
+    def enable_test(*args); end
+    def gembox(*args); end
+    def enable_debug(*args); end
+    def enable_bintest(*args); end
+  end
+
+  conf = FakeConfig.new
+
+  {{ contents }}
 
   if host_is_macos?
     if `xcrun --sdk macosx --show-sdk-path 2>&1`.include?("cannot be located")
