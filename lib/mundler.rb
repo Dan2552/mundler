@@ -16,6 +16,7 @@ module Mundler
 
     project_directory = Dir.pwd
 
+    mundlefile_path = File.expand_path(File.join(project_directory, "Mundlefile"))
     repo, version, contents = read_mundlefile
 
     mundler_root = File.join(ENV["HOME"], ".mundler")
@@ -54,6 +55,7 @@ module Mundler
     config_file = Tempfile.new("mundler")
 
     build_config = File.read(File.join(__dir__, "mundler", "build_config.rb"))
+
     build_config.gsub!("{{ contents }}", contents)
 
     rake = `which rake`.chomp
@@ -85,11 +87,14 @@ module Mundler
       compile = Proc.new do
         system(
           {
+            "MUNDLEFILE" => mundlefile_path,
             "MRUBY_CONFIG" => tempfile.path,
             "PATH" => ([cached_git_dir] + ENV["PATH"].split(":")).join(":")
           },
           "#{rake} deep_clean >#{logfile.path} 2>&1 && #{rake} >#{logfile.path} 2>&1"
         ) || begin
+          print "\e[31mF\e[0m"
+          puts "\n\n"
           puts File.read(logfile)
           error_out("Failed to compile.")
         end

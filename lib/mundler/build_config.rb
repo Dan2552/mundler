@@ -69,6 +69,8 @@ begin
 
   conf = FakeConfig.new
 
+  FileUtils.cd(Pathname.new(ENV["MUNDLEFILE"]).dirname)
+
   {{ contents }}
 
   if host_is_macos?
@@ -84,6 +86,7 @@ begin
     MRuby::Build.new do |conf|
       toolchain :clang
 
+      FileUtils.cd(Pathname.new(ENV["MUNDLEFILE"]).dirname)
       {{ contents }}
 
       this_arch = `uname -m`.chomp
@@ -107,6 +110,7 @@ begin
     MRuby::Build.new do |conf|
       toolchain :clang
 
+      FileUtils.cd(Pathname.new(ENV["MUNDLEFILE"]).dirname)
       {{ contents }}
     end
   end
@@ -114,6 +118,7 @@ begin
   platforms.each do |platform_name, architectures|
     architectures.each do |arch|
       MRuby::CrossBuild.new("#{platform_name}__#{arch}") do |conf|
+        FileUtils.cd(Pathname.new(ENV["MUNDLEFILE"]).dirname)
         {{ contents }}
 
         command = PLATFORM_COMMAND[platform_name]
