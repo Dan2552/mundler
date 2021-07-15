@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    mundler (0.4.0)
+    mundler (0.5.0)
       rake
-      thor (~> 1.1.0)
+      thor
 
 GEM
   remote: https://rubygems.org/
@@ -13,11 +13,11 @@ GEM
 
 PLATFORMS
   -darwin-20
+  arm64-darwin-20
 
 DEPENDENCIES
-  bundler (>= 1.17)
   mundler!
   rake
 
 BUNDLED WITH
-   2.2.16
+   2.2.24
