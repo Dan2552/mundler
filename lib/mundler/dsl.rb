@@ -36,7 +36,7 @@ module Mundler
       config.platform_types[name.to_s] = platform_class
     end
 
-    def platform(name, options)
+    def platform(name, options = {})
       config.platforms << { name: name.to_s, options: options }
     end
 
