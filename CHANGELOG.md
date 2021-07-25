@@ -1,3 +1,7 @@
+# 0.6.1
+
+* Adds cached_git to source files
+
 # 0.6.0
 
 * Add android as a built-in platform
