@@ -18,6 +18,9 @@ Gem::Specification.new do |spec|
     .reject { |f| f.match(%r{^(test|spec|features)/}) }
     .map { |f| Pathname.new(f).relative_path_from(root).to_s }
 
+  spec.files << "lib/mundler/cached_git/cached_git"
+  spec.files << "lib/mundler/cached_git/git"
+
   if File.directory?(File.join(root, "exe"))
     spec.bindir = "exe"
     spec.executables = Dir.glob(File.join(root, "exe", "*"))
