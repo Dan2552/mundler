@@ -175,7 +175,7 @@ module Mundler
     end
 
     def cached_git_dir
-      dir = File.expand_path(File.join(__dir__, "..", "..", "cached_git"))
+      dir = File.expand_path(File.join(__dir__, "cached_git"))
       raise "cached git not found" unless File.file?(File.join(dir, "git"))
       raise "cached git not found" unless File.file?(File.join(dir, "cached_git"))
       dir
