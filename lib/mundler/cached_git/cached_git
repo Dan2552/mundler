@@ -38,8 +38,6 @@ if ARGV[0] == "clone"
     warn "fatal: destination path '#{target}' already exists and is not an empty directory."
     exit 1
   else
-    # require 'irb'
-    # binding.irb
     FileUtils.cp_r(
       File.join(cache_root, repo_org, repo_name, "."),
       File.join(full_target)
