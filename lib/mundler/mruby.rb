@@ -108,6 +108,7 @@ module Mundler
         ) || begin
           $stderr.print "\e[31mF\e[0m"
           $stderr.puts "\n\n"
+          $stderr.puts File.read(build_config)
           $stderr.puts File.read(logfile)
 
           raise Mundler::CompilationError
@@ -130,6 +131,7 @@ module Mundler
         ) || begin
           $stderr.print "\e[31mF\e[0m"
           $stderr.puts "\n\n"
+          $stderr.puts File.read(build_config)
           $stderr.puts File.read(logfile)
 
           raise Mundler::CompilationError
