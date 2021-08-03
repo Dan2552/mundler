@@ -10,10 +10,12 @@ module Mundler
       @gemboxes = []
       @gems = []
       @platform_types = {}
+      @env = {}
     end
 
     attr_reader :mruby
     attr_reader :platform_types
+    attr_reader :env
 
     def hex
       Digest::MD5.hexdigest(to_s)
@@ -36,9 +38,23 @@ module Mundler
         #{mruby.inspect}
         #{platforms.inspect}
         #{platform_types.keys.sort.inspect}
+        #{hashable_string_for_hash(env)}
         #{gemboxes.inspect}
         #{gems.inspect}
       HASHABLE
+    end
+
+    private
+
+    def hashable_string_for_hash(hash)
+      str = "{"
+      sorted_keys = hash.keys.sort
+
+      sorted_keys.each do |key|
+        str = str + "#{key}=>#{hash[key]}"
+      end
+
+      str + "}"
     end
   end
 end

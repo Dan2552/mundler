@@ -43,5 +43,9 @@ module Mundler
     def gem(name, core: nil, path: nil, github: nil)
       config.gems << { name: name, path: path, github: github, core: core }
     end
+
+    def env(name, value)
+      config.env[name] = value
+    end
   end
 end

@@ -55,9 +55,18 @@ module Mundler
       end.join("\n")
     end
 
+    def env_vars
+      str = ""
+      @config.env.each do |key, value|
+        str = str + "\nENV[\"#{key}\"] = \"#{value}\""
+      end
+      str
+    end
+
     def contents
       contents = <<~CONTENTS
         # #{mruby_version}
+        #{env_vars}
 
         MRuby::Build.new do |conf|
           toolchain :clang
