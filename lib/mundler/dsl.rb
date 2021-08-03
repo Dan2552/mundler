@@ -41,6 +41,11 @@ module Mundler
     end
 
     def gem(name, core: nil, path: nil, github: nil)
+      if path && !path.start_with?("/")
+        app_path = Pathname.new(@path).dirname.to_s
+        path = File.expand_path(File.join(app_path, path))
+      end
+
       config.gems << { name: name, path: path, github: github, core: core }
     end
 
