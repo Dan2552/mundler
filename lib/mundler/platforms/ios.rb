@@ -19,19 +19,25 @@ module IOSPlatform
         -isysroot #{ios_sdk}
       )
 
+      cc_command = options.dig(:options, :cc, :command) || clang
+      linker_command = options.dig(:options, :linker, :command) || clang
+
+      cc_flags = flags + Array(options.dig(:options, :cc, :flags) || [])
+      linker_flags = flags + Array(options.dig(:options, :linker, :flags) || [])
+
       <<~BUILD
         MRuby::CrossBuild.new("ios__#{arch}") do |conf|
           #{build_config.gemboxes}
           #{build_config.gems}
 
           conf.cc do |cc|
-            cc.command = #{clang.inspect}
-            cc.flags = #{flags.inspect}
+            cc.command = #{cc_command.inspect}
+            cc.flags = #{cc_flags.inspect}
           end
 
           conf.linker do |l|
-            l.command = #{clang.inspect}
-            l.flags = #{flags.inspect}
+            l.command = #{linker_command.inspect}
+            l.flags = #{linker_flags.inspect}
           end
         end
       BUILD
