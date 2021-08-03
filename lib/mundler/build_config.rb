@@ -47,12 +47,24 @@ module Mundler
 
     private
 
-    def platforms
-      @config.platforms.map do |platform|
-        type = @config.platform_types[platform[:name].to_s]
-        raise "Can't find platform: #{platform[:name]}" unless type
-        type.config(platform, self)
-      end.join("\n")
+    def host_platform
+      @config.platforms
+        .select { |attributes| attributes[:name].to_s == "host" }
+        .map { |attributes| platform(attributes) }
+        .join("\n")
+    end
+
+    def non_host_platforms
+      @config.platforms
+        .select { |attributes| attributes[:name].to_s != "host" }
+        .map { |attributes| platform(attributes) }
+        .join("\n")
+    end
+
+    def platform(attributes)
+      type = @config.platform_types[attributes[:name].to_s]
+      raise "Can't find platform: #{attributes[:name]}" unless type
+      type.config(attributes, self)
     end
 
     def env_vars
@@ -71,14 +83,15 @@ module Mundler
         MRuby::Build.new do |conf|
           toolchain :clang
 
+        #{host_platform}
           #{gemboxes}
           #{gems}
         end
 
-        #{platforms}
+        #{non_host_platforms}
       CONTENTS
 
-      contents.strip + "\n"
+      (contents.strip + "\n").gsub("\n\n\n", "\n\n")
     end
   end
 end
