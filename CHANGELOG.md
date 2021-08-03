@@ -1,3 +1,11 @@
+# 0.7.0
+
+* Fix gems with relative paths
+* Adds "host" as a special platform to allow mruby's host platform cc and linker commands/flags to be customised
+* Allow iOS and Android cc and linker commands/flags to be customised
+* Allow env vars to be set in the Mundlefile DSL
+* Prints build config when builds fail to help debugging
+
 # 0.6.1
 
 * Adds cached_git to source files
