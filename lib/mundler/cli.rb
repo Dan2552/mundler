@@ -11,11 +11,12 @@ module Mundler
     desc "install", "Download and compile mruby"
     def install
       Mundler::Project.new(Dir.pwd).install
+      puts("\e[32mMundle complete!\e[0m")
     rescue Mundler::CompilationError
-      $stderr.puts("\e[31mFailed to install\e[0m")
+      $stderr.puts("\e[31mMundle failed\e[0m")
       exit 1
     rescue Interrupt
-      $stderr.puts("\e[31mUser cancelled\e[0m")
+      $stderr.puts("\e[31mMundle failed (user cancelled)\e[0m")
       exit 1
     rescue MundlefileNotFound
       $stderr.puts("\e[31mMundlefile not found in the current directory\e[0m")

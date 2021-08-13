@@ -63,6 +63,22 @@ module Mundler
     def compile(build_config)
       logfile = Tempfile.new(['mundler_build', '.log'])
 
+      version = (
+        @config.mruby[:tag] ||
+        @config.mruby[:branch] ||
+        @config.mruby[:version]
+      )
+
+      @config.gemboxes.each do |gembox|
+        puts "Using #{gembox} gembox"
+      end
+      @config.gems.each do |gem|
+        puts "Using #{gem[:name]} gem"
+      end
+
+      puts "Using mruby (#{version})"
+
+
       success_indicator = File.join(@path, ".mundler_built_successfully")
       if File.file?(success_indicator)
         return
@@ -80,7 +96,7 @@ module Mundler
               directory = pathname.directory? ? pathname.to_s : Pathname.new(file).dirname.to_s
               next if covered.include?(directory)
               covered << directory
-              print "\e[32m.\e[0m"
+              print "\e[34m.\e[0m"
             end
           end
           sleep(0.3)
@@ -129,9 +145,11 @@ module Mundler
         end
       end
 
-      output_thread.kill
+      puts "\n\n"
+
       FileUtils.touch(success_indicator)
     ensure
+      output_thread.kill if output_thread
       logfile.close
       logfile.delete
     end

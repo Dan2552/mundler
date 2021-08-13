@@ -1,5 +1,5 @@
 # class ExampleLibrary
-#   def build(platform)
+#   def build(platform, options)
 #   end
 
 #   def platform_configuration(platform, options)

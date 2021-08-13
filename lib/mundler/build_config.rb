@@ -72,7 +72,11 @@ module Mundler
 
         raise "Unknown library: #{library_name}" unless library_type
 
-        library_attrs = library_type.new.platform_configuration(platform_name, library_options)
+        library_builder = library_type.new
+
+        puts "Using #{library_name} library (#{platform_name})"
+        library_builder.build(platform_name, library_options)
+        library_attrs = library_builder.platform_configuration(platform_name, library_options)
 
         merge_platform_attributes!(options, library_attrs)
       end
