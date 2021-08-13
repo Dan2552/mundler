@@ -29,7 +29,8 @@ module Mundler
       FileUtils.rm_rf(@path)
       FileUtils.mkdir_p(@path)
       FileUtils.cd(@path)
-      git_clone = Proc.new do
+
+      Mundler.with_clean_env do
         system(
           {
             # The {mundler gem path}/cached_git directory contains a binary called
@@ -39,14 +40,6 @@ module Mundler
           },
           "git clone #{mruby_url} . >/dev/null 2>&1"
         ) || error_out("Failed to clone mruby: #{mruby_url}")
-      end
-
-      if defined?(Bundler) && Bundler.respond_to?(:with_unbundled_env)
-        Bundler.with_unbundled_env(&git_clone)
-      elsif defined?(Bundler)
-        Bundler.with_clean_env(&git_clone)
-      else
-        git_clone.call
       end
 
       if version
@@ -94,7 +87,7 @@ module Mundler
         end
       end
 
-      clean = Proc.new do
+      Mundler.with_clean_env do
         rake = `which rake`.chomp
         system(
           {
@@ -115,9 +108,7 @@ module Mundler
         end
 
         cleaned = true
-      end
 
-      compile = Proc.new do
         rake = `which rake`.chomp
         system(
           {
@@ -136,17 +127,6 @@ module Mundler
 
           raise Mundler::CompilationError
         end
-      end
-
-      if defined?(Bundler) && Bundler.respond_to?(:with_unbundled_env)
-        Bundler.with_unbundled_env(&clean)
-        Bundler.with_unbundled_env(&compile)
-      elsif defined?(Bundler)
-        Bundler.with_clean_env(&clean)
-        Bundler.with_clean_env(&compile)
-      else
-        clean.call
-        compile.call
       end
 
       output_thread.kill

@@ -61,10 +61,86 @@ module Mundler
         .join("\n")
     end
 
-    def platform(attributes)
-      type = @config.platform_types[attributes[:name].to_s]
-      raise "Can't find platform: #{attributes[:name]}" unless type
-      type.config(attributes, self)
+    def platform(platform_attrs)
+      platform_name = platform_attrs[:name].to_s
+      type = @config.platform_types[platform_name]
+      raise "Can't find platform: #{platform_name}" unless type
+
+      options = {}
+      @config.libraries.each do |library_name, library_options|
+        library_type = @config.library_types[library_name]
+
+        raise "Unknown library: #{library_name}" unless library_type
+
+        library_attrs = library_type.new.platform_configuration(platform_name, library_options)
+
+        merge_platform_attributes!(options, library_attrs)
+      end
+
+      merge_platform_attributes!(options, platform_attrs[:options])
+
+      type.config(platform_attrs.merge(options: options), self)
+    end
+
+    # Merge with a bit of specific logic to make sure build settings
+    #
+    # E.g. if lhs was something like
+    #
+    # ```
+    # {
+    #   cc: { flags: "-I#{sdl_install}/include/SDL2" },
+    #   linker: { flags: "-L#{sdl_install}/lib -lSDL2 -lSDL2_image -lSDL2_ttf" }
+    # }
+    # ```
+    #
+    # and rhs was like
+    #
+    # ```
+    # {
+    #   cc: { flags: "abc" },
+    #   linker: { flags: "def" },
+    #   more_options: true
+    # }
+    # ```
+    #
+    # result would be
+    # ```
+    # {
+    #   cc: { flags: ["-I#{sdl_install}/include/SDL2", "abc"] },
+    #   linker: { flags: ["-L#{sdl_install}/lib -lSDL2 -lSDL2_image -lSDL2_ttf", "def"] }
+    #   more_options: true
+    # }
+    # ```
+    #
+    def merge_platform_attributes!(lhs, rhs)
+      rhs = rhs.dup
+
+      [:cc, :linker].each do |cc_or_linker|
+        [:command, :flags].each do |command_or_flags|
+          lhs_flags = lhs.dig(cc_or_linker, command_or_flags)
+          rhs_flags = rhs.dig(cc_or_linker, command_or_flags)
+
+          if rhs_flags
+            lhs[cc_or_linker] ||= {}
+            lhs[cc_or_linker][command_or_flags] ||= []
+            lhs_flags = lhs.dig(cc_or_linker, command_or_flags)
+
+            if lhs_flags.is_a?(String)
+              lhs[cc_or_linker][command_or_flags] = [lhs_flags]
+            end
+
+            if rhs_flags.is_a?(String)
+              rhs[cc_or_linker][command_or_flags] = [rhs_flags]
+            end
+
+            lhs[cc_or_linker][command_or_flags] = lhs[cc_or_linker][command_or_flags] + rhs[cc_or_linker][command_or_flags]
+          end
+        end
+
+        rhs.delete(cc_or_linker)
+      end
+
+      lhs.merge!(rhs)
     end
 
     def env_vars

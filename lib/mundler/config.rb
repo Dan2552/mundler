@@ -10,11 +10,15 @@ module Mundler
       @gemboxes = []
       @gems = []
       @platform_types = {}
+      @library_types = {}
       @env = {}
+      @libraries = {}
     end
 
     attr_reader :mruby
     attr_reader :platform_types
+    attr_reader :library_types
+    attr_reader :libraries
     attr_reader :env
 
     def hex
@@ -38,9 +42,11 @@ module Mundler
         #{mruby.inspect}
         #{platforms.inspect}
         #{platform_types.keys.sort.inspect}
+        #{library_types.keys.sort.inspect}
         #{hashable_string_for_hash(env)}
         #{gemboxes.inspect}
         #{gems.inspect}
+        #{hashable_string_for_hash(libraries)}
       HASHABLE
     end
 
@@ -50,9 +56,9 @@ module Mundler
       str = "{"
       sorted_keys = hash.keys.sort
 
-      sorted_keys.each do |key|
+      sorted_keys.map do |key|
         str = str + "#{key}=>#{hash[key]}"
-      end
+      end.join(", ")
 
       str + "}"
     end

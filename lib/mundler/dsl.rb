@@ -3,13 +3,12 @@ module Mundler
     def initialize(path)
       @config = Config.new
       @path = path
+
+      load_libraries
+      load_platforms
     end
 
     def evaluate!
-      platforms = Dir.glob(File.join(__dir__, "platforms", "*.rb"))
-      platforms.each do |platform|
-        instance_eval(File.read(platform))
-      end
       begin
         instance_eval(File.read(@path), @path)
       rescue Errno::ENOENT
@@ -18,6 +17,20 @@ module Mundler
     end
 
     attr_reader :config
+
+    def load_libraries
+      libraries = Dir.glob(File.join(__dir__, "libraries", "*.rb"))
+      libraries.each do |library|
+        instance_eval(File.read(library))
+      end
+    end
+
+    def load_platforms
+      platforms = Dir.glob(File.join(__dir__, "platforms", "*.rb"))
+      platforms.each do |platform|
+        instance_eval(File.read(platform))
+      end
+    end
 
     private
 
@@ -51,6 +64,14 @@ module Mundler
 
     def env(name, value)
       config.env[name] = value
+    end
+
+    def library(name, options = {})
+      config.libraries[name.to_s] = options
+    end
+
+    def define_library(name, library_class)
+      config.library_types[name.to_s] = library_class
     end
   end
 end
