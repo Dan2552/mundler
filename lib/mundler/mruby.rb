@@ -39,7 +39,7 @@ module Mundler
             "PATH" => ([cached_git_dir] + ENV["PATH"].split(":")).join(":")
           },
           "git clone #{mruby_url} . >/dev/null 2>&1"
-        ) || error_out("Failed to clone mruby: #{mruby_url}")
+        ) || raise(Mundler::CloneError, "Failed to clone #{mruby_url}")
       end
 
       if version

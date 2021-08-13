@@ -12,6 +12,7 @@ require "mundler/clean_environment"
 
 module Mundler
   class CompilationError < StandardError; end
+  class CloneError < CompilationError; end
   class NotInstalledError < StandardError; end
   class MundlefileNotFound < StandardError; end
 end
