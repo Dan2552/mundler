@@ -28,6 +28,7 @@ module Mundler
       project = Mundler::Project.new(Dir.pwd)
       project.clean
       project.install
+      puts("\e[32mMundle complete!\e[0m")
     rescue Mundler::CompilationError
       $stderr.puts("\e[31mFailed to install\e[0m")
       exit 1
