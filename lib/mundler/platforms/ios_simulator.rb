@@ -1,6 +1,6 @@
 module IOSSimulatorPlatform
   def self.config(options, build_config)
-    valid_archs = [:i386, :x86_64]
+    valid_archs = [:i386, :x86_64, :arm64]
     options[:archs] ||= valid_archs
 
     options[:archs].map do |arch|
@@ -19,19 +19,25 @@ module IOSSimulatorPlatform
         -isysroot #{ios_simulator_sdk}
       )
 
+      cc_command = options.dig(:cc, :command) || clang
+      linker_command = options.dig(:linker, :command) || clang
+
+      cc_flags = flags + Array(options.dig(:cc, :flags) || [])
+      linker_flags = flags + Array(options.dig(:linker, :flags) || [])
+
       <<~BUILD
         MRuby::CrossBuild.new("ios_simulator__#{arch}") do |conf|
           #{build_config.gemboxes}
           #{build_config.gems}
 
           conf.cc do |cc|
-            cc.command = #{clang.inspect}
-            cc.flags = #{flags.inspect}
+            cc.command = #{cc_command.inspect}
+            cc.flags = #{cc_flags.inspect}
           end
 
           conf.linker do |l|
-            l.command = #{clang.inspect}
-            l.flags = #{flags.inspect}
+            l.command = #{linker_command.inspect}
+            l.flags = #{linker_flags.inspect}
           end
         end
       BUILD

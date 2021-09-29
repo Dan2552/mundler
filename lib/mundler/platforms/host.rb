@@ -1,7 +1,6 @@
 module HostPlatform
-  def self.config(host_options, build_config)
+  def self.config(options, build_config)
     build = ""
-    options = host_options[:options]
 
     if options[:cc]
       build += "  conf.cc do |cc|\n"

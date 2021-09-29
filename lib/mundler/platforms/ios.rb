@@ -1,7 +1,8 @@
 module IOSPlatform
   def self.config(options, build_config)
     valid_archs = [:armv7, :arm64]
-    options[:archs] ||= valid_archs
+    default_archs = [:arm64]
+    options[:archs] ||= default_archs
 
     options[:archs].map do |arch|
       unless valid_archs.include?(arch)
@@ -19,11 +20,11 @@ module IOSPlatform
         -isysroot #{ios_sdk}
       )
 
-      cc_command = options.dig(:options, :cc, :command) || clang
-      linker_command = options.dig(:options, :linker, :command) || clang
+      cc_command = options.dig(:cc, :command) || clang
+      linker_command = options.dig(:linker, :command) || clang
 
-      cc_flags = flags + Array(options.dig(:options, :cc, :flags) || [])
-      linker_flags = flags + Array(options.dig(:options, :linker, :flags) || [])
+      cc_flags = flags + Array(options.dig(:cc, :flags) || [])
+      linker_flags = flags + Array(options.dig(:linker, :flags) || [])
 
       <<~BUILD
         MRuby::CrossBuild.new("ios__#{arch}") do |conf|

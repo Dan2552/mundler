@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mundler (0.7.0)
+    mundler (0.8.0)
       rake
       thor
 

@@ -77,13 +77,13 @@ module Mundler
         puts "Using #{library_name} library (#{platform_name})"
         library_builder.build(platform_name, library_options)
         library_attrs = library_builder.platform_configuration(platform_name, library_options)
-
+        raise "Library #{library_name} for platform #{platform_name} returned expected result" unless library_attrs.is_a?(Hash)
         merge_platform_attributes!(options, library_attrs)
       end
 
       merge_platform_attributes!(options, platform_attrs[:options])
 
-      type.config(platform_attrs.merge(options: options), self)
+      type.config(options, self)
     end
 
     # Merge with a bit of specific logic to make sure build settings
