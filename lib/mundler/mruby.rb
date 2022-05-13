@@ -44,7 +44,8 @@ module Mundler
 
       if version
         system("git reset --hard #{version} >/dev/null 2>&1") ||
-          error_out("Failed to set version to #{version}")
+          system("git reset --hard origin/#{version} >/dev/null 2>&1") ||
+          exit_out("Failed to set mruby version to \"#{version}\".")
       end
 
       FileUtils.touch(success_indicator)
@@ -168,6 +169,11 @@ module Mundler
     end
 
     private
+
+    def exit_out(msg)
+      STDERR.puts("\e[31m#{msg}\e[0m")
+      exit(1)
+    end
 
     def installed?
       success_indicator = File.join(@path, ".mundler_built_successfully")
