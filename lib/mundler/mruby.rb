@@ -74,7 +74,11 @@ module Mundler
         puts "Using #{gembox} gembox"
       end
       @config.gems.each do |gem|
-        puts "Using #{gem[:name]} gem"
+        if gem[:platforms].empty?
+          puts "Using #{gem[:name]} gem"
+        else
+          puts "Using #{gem[:name]} gem for platforms: #{gem[:platforms]}"
+        end
       end
 
       puts "Using mruby (#{version})"

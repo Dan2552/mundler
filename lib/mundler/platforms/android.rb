@@ -25,7 +25,7 @@ module AndroidPlatform
 
         #{cc_and_linker(options[:options])}
           #{build_config.gemboxes}
-          #{build_config.gems}
+          #{build_config.gems(:android)}
         end
       BUILD
     end.join("\n")

@@ -11,7 +11,7 @@ module WASMPlatform
         toolchain :clang
 
         #{build_config.gemboxes}
-        #{build_config.gems}
+        #{build_config.gems(:wasm)}
 
         conf.cc do |cc|
           cc.command = #{cc_command.inspect}

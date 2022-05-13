@@ -28,7 +28,7 @@ module IOSSimulatorPlatform
       <<~BUILD
         MRuby::CrossBuild.new("ios_simulator__#{arch}") do |conf|
           #{build_config.gemboxes}
-          #{build_config.gems}
+          #{build_config.gems(:ios_simulator)}
 
           conf.cc do |cc|
             cc.command = #{cc_command.inspect}

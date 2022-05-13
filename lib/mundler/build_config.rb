@@ -16,8 +16,12 @@ module Mundler
       end.join("\n")
     end
 
-    def gems
+    def gems(platform_name)
       @config.gems.map do |gem|
+        if !gem[:platforms].empty? && !gem[:platforms].include?(platform_name.to_sym)
+          next
+        end
+
         # e.g. gem = {:name=>"mruby-regexp-pcre", :path=>nil, :github=>nil, :core=>nil}
         args = ":mgem => #{gem[:name].inspect}"
 
@@ -165,13 +169,21 @@ module Mundler
 
         #{host_platform}
           #{gemboxes}
-          #{gems}
+          #{gems(:host)}
         end
 
         #{non_host_platforms}
       CONTENTS
 
-      (contents.strip + "\n").gsub("\n\n\n", "\n\n")
+      contents = contents.strip + "\n"
+
+      3.times do
+        contents.gsub!("\n  \n", "\n\n")
+        contents.gsub!("\n\n\n", "\n\n")
+        contents.gsub!("\n\nend", "\nend")
+      end
+
+      contents
     end
   end
 end

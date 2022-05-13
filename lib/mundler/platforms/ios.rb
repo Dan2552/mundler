@@ -29,7 +29,7 @@ module IOSPlatform
       <<~BUILD
         MRuby::CrossBuild.new("ios__#{arch}") do |conf|
           #{build_config.gemboxes}
-          #{build_config.gems}
+          #{build_config.gems(:ios)}
 
           conf.cc do |cc|
             cc.command = #{cc_command.inspect}
