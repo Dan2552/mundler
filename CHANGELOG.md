@@ -1,3 +1,16 @@
+# 0.9.0
+
+* Web assembly support (wasm)
+* Allow individual gems to specify target platform(s)
+* Fix implicit "stable" mruby
+* Fix error messaging when the target mruby version isn't available
+
+# 0.8.0
+
+* Basic "libraries" support
+* General text output improvements
+* Fixes for optional platform options
+
 # 0.7.0
 
 * Fix gems with relative paths
