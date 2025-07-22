@@ -9,11 +9,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     rake (13.0.3)
-    thor (1.2.1)
+    thor (1.4.0)
 
 PLATFORMS
   -darwin-20
   arm64-darwin-20
+  x86_64-linux
 
 DEPENDENCIES
   mundler!
